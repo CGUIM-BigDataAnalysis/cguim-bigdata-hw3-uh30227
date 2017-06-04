@@ -40,25 +40,36 @@ output: github_document
 
 ## 網站資料爬取
 ```{r}
-#這是R Code Chunk
-library(rvest) ##第一次使用要先安裝 install.packages("rvest")
-##read_html
-##html_nodes
-##html_text
+##install.packages("rvest") ##安裝
+library(rvest) ##載入
+dataframeAll=NULL
+for(i in 5289:5299){
+url=paste0("http://www.ptt.cc/bbs/movie/index",i,".html",sep='')
+PTT_Title = read_html(url) %>% html_nodes(".title") %>% html_text()
+PTT_PushNum = read_html(url) %>% html_nodes(".nrec") %>% html_text()
+PTT_Author = read_html(url) %>% html_nodes(".author") %>% html_text()
+dataframe = data.frame(title = PTT_Title, PushNum=PTT_PushNum, Author=PTT_Author)
+dataframeAll<-rbind(dataframeAll,dataframe)
+}
 ```
 
 ## 爬蟲結果呈現
 ```{r}
-#這是R Code Chunk
-knitr::kable(iris) ##請將iris取代為上個步驟中產生的爬蟲資料資料框
+knitr::kable(
+    dataframeAll[1:120,c("title","PushNum","Author")])
 ```
 
 ## 解釋爬蟲結果 
 ```{r}
-#這是R Code Chunk
+##install.packages("jsonlite")
+library(jsonlite)
+myjson <- toJSON(dataframeAll)
+str(dataframeAll)
+table(dataframeAll$ Author)
 ```
 
-解釋解釋解釋解釋
+(1)總共爬出220 篇文章，裡面共有3個變數:title、PushNum、Author
+(2)沒有名字的作者最多，共有15篇沒屬名的文章，有屬名的文章以DantesChen的文章最多，共4篇
 
 ```{r}
 #這是R Code Chunk
